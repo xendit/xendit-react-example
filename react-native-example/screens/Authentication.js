@@ -14,7 +14,7 @@ export default class AuthenticationScreen extends Component {
 
     this.state = {
       amount: '70000',
-      tokenId: '5ceb7ce30ab2454b10594553',
+      tokenId: '5ceb866e1b4e475a026cb03c',
       isAuthenticating: false,
       isRenderWebview: false,
       webviewUrl: ''
