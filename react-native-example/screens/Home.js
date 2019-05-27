@@ -22,12 +22,6 @@ export default class HomeScreen extends Component {
         >
           <Text> Create Authentication </Text>
         </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.option}
-          onPress={() => navigate('Validation')}
-        >
-          <Text> Validation Util </Text>
-        </TouchableHighlight>
       </View>
     );
   }

@@ -112,6 +112,8 @@ export default class TokenScreen extends Component {
   _tokenResponseHandler(err, token) {
     if (err) {
       alert(JSON.stringify(err));
+      this.setIsTokenizing();
+
       return;
     }
     
