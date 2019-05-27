@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CheckBox, Text, View, TextInput, StyleSheet, TouchableHighlight } from 'react-native';
+import { CheckBox, Text, View, TextInput, StyleSheet, TouchableHighlight, WebView } from 'react-native';
 import Xendit from 'xendit-js-node';
 
 export default class TokenScreen extends Component {
@@ -11,17 +11,29 @@ export default class TokenScreen extends Component {
     super(props);
 
     this.state = {
+      amount: '70000',
       cardNumber: '4000000000000002',
       cardExpMonth: '12',
       cardExpYear: String(new Date().getFullYear() + 1),
       cardCvn: '123',
       isMultipleUse: false,
-      isSkip3DS: false
+      isSkip3DS: false,
+      isTokenizing: false,
+      isRenderWebview: false,
+      webviewUrl: ''
     }
 
     this.tokenize = this.tokenize.bind(this);
     this.getTokenData = this.getTokenData.bind(this);
     this._tokenResponseHandler = this._tokenResponseHandler.bind(this);
+    this.setIsTokenizing = this.setIsTokenizing.bind(this);
+    this.onMessage = this.onMessage.bind(this);
+  }
+
+  onAmountChange(text) {
+    this.setState({
+      amount: text
+    });
   }
 
   onCardNumberChange(text) {
@@ -51,16 +63,23 @@ export default class TokenScreen extends Component {
   onMultiUseChange(val) {
     this.setState({
       isMultipleUse: val
-    })
+    });
   }
 
   onSkip3DSChange(val) {
     this.setState({
       isSkip3DS: val
-    })
+    });
+  }
+
+  setIsTokenizing() {
+    this.setState({
+      isTokenizing: !this.state.isTokenizing
+    });
   }
 
   tokenize() {
+    this.setIsTokenizing();
     Xendit.setPublishableKey('xnd_public_development_OYqIfOUth+GowsY6LeJOHzLCZtSj84J9kXDn+Rxj/mbf/LCoCQdxgA==');
 
     const tokenData = this.getTokenData();
@@ -70,6 +89,7 @@ export default class TokenScreen extends Component {
 
   getTokenData() {
     const {
+      amount,
       cardNumber,
       cardExpMonth,
       cardExpYear,
@@ -79,7 +99,7 @@ export default class TokenScreen extends Component {
     } = this.state;
 
     return {
-      amount: 10000,
+      amount,
       card_number: cardNumber,
       card_exp_month: cardExpMonth,
       card_exp_year: cardExpYear,
@@ -102,25 +122,62 @@ export default class TokenScreen extends Component {
         alert(JSON.stringify(token));
         break;
       case 'IN_REVIEW':
-        alert('need work');
+        this.setState({
+          webviewUrl: token.payer_authentication_url,
+          isRenderWebview: true
+        });
+
         break;
       default:
+        alert('Unknown token status');
         break;
     }
+
+    this.setIsTokenizing();
+  }
+
+  onMessage(rawData) {
+    const data = JSON.parse(rawData.nativeEvent.data);
+
+    this.setState({
+      isRenderWebview: false
+    }, () => {
+      alert(JSON.stringify(data));
+    });
   }
 
   render() {
     const {
+      amount,
       cardNumber,
       cardExpMonth,
       cardExpYear,
       cardCvn,
       isMultipleUse,
-      isSkip3DS
+      isSkip3DS,
+      webviewUrl,
+      isRenderWebview,
+      isTokenizing
     } = this.state;
+
+    if (isRenderWebview) {
+      return (
+        <WebView
+          source={{uri: webviewUrl}}
+          onMessage={this.onMessage}
+        />
+      )
+    }
 
     return (
       <View style={styles.mainContainer}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Amount"
+          defaultValue={amount}
+          onChangeText={text => this.onAmountChange(text)}
+          keyboardType={'numeric'}
+        />
         <TextInput
           style={styles.textInput}
           placeholder="Card Number"
@@ -172,6 +229,7 @@ export default class TokenScreen extends Component {
         <TouchableHighlight
           style={styles.button}
           onPress={this.tokenize}
+          disabled={isTokenizing}
         >
           <Text style={{color: '#fff'}}>Tokenize</Text>
         </TouchableHighlight>
@@ -194,7 +252,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     width: '90%',
     fontSize: 15,
-    height: 40
+    height: 40,
+    marginTop: 10
   },
   secondaryTextContainer: {
     width: '90%',
