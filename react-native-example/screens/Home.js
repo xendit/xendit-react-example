@@ -7,23 +7,24 @@ export default class HomeScreen extends Component {
   };
 
   render() {
+    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
         <TouchableHighlight
           style={styles.option}
-          onPress={this.onPress}
+          onPress={() => navigate('Token')}
         >
           <Text> Create Token </Text>
         </TouchableHighlight>
         <TouchableHighlight
           style={styles.option}
-          onPress={this.onPress}
+          onPress={() => navigate('Authentication')}
         >
           <Text> Create Authentication </Text>
         </TouchableHighlight>
         <TouchableHighlight
           style={styles.option}
-          onPress={this.onPress}
+          onPress={() => navigate('Validation')}
         >
           <Text> Validation Util </Text>
         </TouchableHighlight>
