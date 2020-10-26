@@ -13,7 +13,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-elements": "1.1.0",
     "react-navigation": "3.11.0",
-    "xendit-js-node": "1.0.0"
+    "xendit-js-node": "2.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0"
